@@ -1,59 +1,143 @@
-// Base Class
-class Person {
-    String name;
-    int age;
+import java.util.ArrayList;
+import java.util.Scanner;
 
-    Person(String name, int age) {
-        this.name = name;
-        this.age = age;
+public class StudentManagementSystem {
+
+    // 1. Base Class
+    static class Person {
+        String name;
+        int age;
+
+        Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
     }
 
-    void display() {
-        System.out.println("Name: " + name);
-        System.out.println("Age: " + age);
-    }
-}
+    // 2. Derived Class
+    static class Student extends Person {
+        int rollNo;
+        double marks;
 
-// Derived Class
-class Student extends Person {
-    int rollNo;
-    double marks;
-
-    Student(String name, int age, int rollNo, double marks) {
-        super(name, age);
-        this.rollNo = rollNo;
-        this.marks = marks;
+        Student(String name, int age, int rollNo, double marks) {
+            super(name, age);
+            this.rollNo = rollNo;
+            this.marks = marks;
+        }
     }
 
-    void displayStudent() {
-        display();
-        System.out.println("Roll No: " + rollNo);
-        System.out.println("Marks: " + marks);
+    // 3. Further Derived Class
+    static class GraduateStudent extends Student {
+        String specialization;
+
+        GraduateStudent(String name, int age, int rollNo, double marks, String specialization) {
+            super(name, age, rollNo, marks);
+            this.specialization = specialization;
+        }
+
+        @Override
+        public String toString() {
+            return "Name: " + name +
+                   " | Age: " + age +
+                   " | Roll No: " + rollNo +
+                   " | Marks: " + marks +
+                   " | Specialization: " + specialization;
+        }
     }
-}
 
-// Further Derived Class
-class GraduateStudent extends Student {
-    String specialization;
+    // 4. Management Logic
+    private ArrayList<GraduateStudent> students = new ArrayList<>();
+    private Scanner scanner = new Scanner(System.in);
 
-    GraduateStudent(String name, int age, int rollNo, double marks, String specialization) {
-        super(name, age, rollNo, marks);
-        this.specialization = specialization;
+    public void run() {
+        int choice;
+        do {
+            System.out.println("\n--- 🎓 Student Menu ---");
+            System.out.println("1. Add Student");
+            System.out.println("2. Remove Student");
+            System.out.println("3. Search Student");
+            System.out.println("4. Display All Students");
+            System.out.println("5. Exit");
+            System.out.print("Enter choice: ");
+
+            while (!scanner.hasNextInt()) {
+                System.out.println("Enter valid number.");
+                scanner.next();
+            }
+
+            choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1 -> addStudent();
+                case 2 -> removeStudent();
+                case 3 -> searchStudent();
+                case 4 -> displayStudents();
+                case 5 -> System.out.println("Exiting...");
+                default -> System.out.println("Invalid choice.");
+            }
+
+        } while (choice != 5);
     }
 
-    void displayGraduate() {
-        displayStudent();
-        System.out.println("Specialization: " + specialization);
-    }
-}
+    private void addStudent() {
+        System.out.print("Enter Name: ");
+        String name = scanner.nextLine();
 
-// Main Class
-public class Main {
+        System.out.print("Enter Age: ");
+        int age = scanner.nextInt();
+
+        System.out.print("Enter Roll No: ");
+        int roll = scanner.nextInt();
+
+        System.out.print("Enter Marks: ");
+        double marks = scanner.nextDouble();
+        scanner.nextLine();
+
+        System.out.print("Enter Specialization: ");
+        String spec = scanner.nextLine();
+
+        students.add(new GraduateStudent(name, age, roll, marks, spec));
+        System.out.println("✔️ Student added successfully!");
+    }
+
+    private void removeStudent() {
+        System.out.print("Enter Roll No to remove: ");
+        int roll = scanner.nextInt();
+
+        boolean removed = students.removeIf(s -> s.rollNo == roll);
+
+        if (removed) {
+            System.out.println("❌ Student removed.");
+        } else {
+            System.out.println("⚠️ Student not found.");
+        }
+    }
+
+    private void searchStudent() {
+        System.out.print("Enter Roll No to search: ");
+        int roll = scanner.nextInt();
+
+        students.stream()
+                .filter(s -> s.rollNo == roll)
+                .findFirst()
+                .ifPresentOrElse(
+                        System.out::println,
+                        () -> System.out.println("⚠️ Student not found.")
+                );
+    }
+
+    private void displayStudents() {
+        if (students.isEmpty()) {
+            System.out.println("No students available.");
+        } else {
+            System.out.println("\n--- Student List ---");
+            students.forEach(System.out::println);
+        }
+    }
+
+    // 5. Main Method
     public static void main(String[] args) {
-        GraduateStudent g = new GraduateStudent(
-            "Rahul", 22, 101, 85.5, "IT"
-        );
-
-        g.displayGraduate();
+        new StudentManagementSystem().run();
     }
 }
